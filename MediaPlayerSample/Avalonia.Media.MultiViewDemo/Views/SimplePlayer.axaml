@@ -7,7 +7,35 @@
              x:DataType="vm:SimpleViewModel" 
              x:Class="Avalonia.Media.MultiViewDemo.Views.SimplePlayer"
              x:Name="Me">
-    <Border Margin="5" Padding="10" BorderBrush="White" BorderThickness="1">
+    <DockPanel Margin="5">
+          <ItemsControl ItemsSource="{Binding #Me.Screenshots}" DockPanel.Dock="Right">
+              <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                      <ReversibleStackPanel Orientation="Vertical" ReverseOrder="True" />
+                  </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                      <Image Width="200" Source="{Binding .}">
+                          <Image.Styles>
+                              <Style Selector="Image">
+                                  <Style.Animations>
+                                      <Animation Duration="00:00:00.200">
+                                          <KeyFrame Cue="0%">
+                                              <Setter Property="Opacity" Value="0" />
+                                          </KeyFrame>
+                                          <KeyFrame Cue="100%">
+                                              <Setter Property="Opacity" Value="1" />
+                                          </KeyFrame>
+                                      </Animation>
+                                  </Style.Animations>
+                              </Style>
+                          </Image.Styles>
+                      </Image>
+                  </DataTemplate>
+              </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
         <UniformGrid Rows="2" Columns="2">
             <Border Margin="5" Padding="5" BorderBrush="Red" BorderThickness="1">
                 <Grid RowDefinitions="Auto,*">
@@ -55,10 +83,10 @@
                                 Minimum="0"
                                 Value="{Binding CurrentPosition}" />
                         <Label Width="70" VerticalAlignment="Center" Grid.Column="2" Margin="5"
-                               Content="{Binding Duration,  StringFormat='hh\\:mm\\:ss'}" />
+                               Content="{Binding Duration, StringFormat='hh\\:mm\\:ss'}" />
                     </Grid>
                 </Grid>
             </Border>
         </UniformGrid>
-    </Border>
+    </DockPanel>
 </UserControl>
