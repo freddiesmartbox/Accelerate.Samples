@@ -5,7 +5,8 @@
              xmlns:vm="clr-namespace:Avalonia.Media.MultiViewDemo.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="vm:SimpleViewModel" 
-             x:Class="Avalonia.Media.MultiViewDemo.Views.SimplePlayer">
+             x:Class="Avalonia.Media.MultiViewDemo.Views.SimplePlayer"
+             x:Name="Me">
     <Border Margin="5" Padding="10" BorderBrush="White" BorderThickness="1">
         <UniformGrid Rows="2" Columns="2">
             <Border Margin="5" Padding="5" BorderBrush="Red" BorderThickness="1">
@@ -41,6 +42,8 @@
                         <Button Command="{Binding PlayAsync}">Play</Button>
                         <Button Command="{Binding PauseAsync}">Pause</Button>
                         <Button Command="{Binding StopAsync}">Stop</Button>
+                        <Button Command="{Binding #Me.SnapAsync}">Snap</Button>
+                        <ToggleButton IsChecked="{Binding Autoplay}">Autoplay</ToggleButton>
                     </StackPanel>
                     <Grid HorizontalAlignment="Stretch" Grid.Row="2" ColumnDefinitions="Auto,*,Auto">
                         <Label Width="70" VerticalAlignment="Center" Grid.Column="0" Margin="5"

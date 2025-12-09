@@ -5,6 +5,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <AvaloniaUILicenseKey Include="$(AccelerateLicenseKey)" />
+    <AvaloniaUILicenseKey Include="$(AVLN_OFF_KEY)" />
   </ItemGroup>
 </Project>
