@@ -1,4 +1,7 @@
 using System;
+using System.Diagnostics;
+using System.Numerics;
+using System.Threading;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
@@ -24,6 +27,13 @@ public partial class SimplePlayer : UserControl
         _currentPresenter = 0;
 
         DataContext = new SimpleViewModel();
+
+        this.DetachedFromVisualTree += SimplePlayer_DetachedFromVisualTree;
+    }
+
+    private void SimplePlayer_DetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+    {
+        Vm?.Player?.UnInitialize();
     }
 
     protected override void OnDataContextChanged(EventArgs e)
@@ -46,10 +56,12 @@ public partial class SimplePlayer : UserControl
 
     private void UpdatePlayerSize(Size size)
     {
+        Vm?.Player?.UpdateTargetVisual(_presenters[_currentPresenter]);
+
         _currentSize = size;
         var presenter = _presenters[_currentPresenter];
 
-        foreach(var p in _presenters)
+        foreach (var p in _presenters)
         {
             var e = ElementComposition.GetElementChildVisual(p);
             var c = e?.Compositor;
@@ -71,7 +83,9 @@ public partial class SimplePlayer : UserControl
 
     private void Slider_ValueChanged(object? sender, Avalonia.Controls.Primitives.RangeBaseValueChangedEventArgs e)
     {
-
+        var candidate = TimeSpan.FromTicks((long)_progressSlider.Value);
+        if (Vm?.Player is { } player && Math.Abs((candidate - player.Position).TotalSeconds) > 0.5)
+            player.Position = candidate;
     }
 
     private async void LoadButton_Click(object? sender, RoutedEventArgs e)
@@ -85,8 +99,10 @@ public partial class SimplePlayer : UserControl
             AllowMultiple = false
         });
 
-        if (files.Count != 1) return;
-        if (files[0].Path is not { } path) return;
+        if (files.Count != 1)
+            return;
+        if (files[0].Path is not { } path)
+            return;
 
         Vm.Source = new StorageFileSource(files[0]);
     }
@@ -95,10 +111,19 @@ public partial class SimplePlayer : UserControl
     {
         _currentPresenter = (++_currentPresenter) % _presenters.Length;
 
-        if(Vm?.Player is { } player)
+        if (Vm?.Player is { } player)
         {
             player.UpdateTargetVisual(_presenters[_currentPresenter]);
             UpdatePlayerSize(_currentSize);
+        }
+    }
+
+    public async void SnapAsync()
+    {
+        if (ElementComposition.GetElementChildVisual(_presenters[_currentPresenter]) is { } compositionVisual)
+        {
+            var bmp = await compositionVisual.Compositor.CreateCompositionVisualSnapshot(compositionVisual, 1);
+            bmp.Save(@"C:\Dev\Junk\bmp.bmp");
         }
     }
 }
