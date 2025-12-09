@@ -1,10 +1,12 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Numerics;
 using System.Threading;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.Media.Imaging;
 using Avalonia.Media.MultiViewDemo.ViewModels;
 using Avalonia.Platform.Storage;
 using Avalonia.Rendering.Composition;
@@ -19,6 +21,8 @@ public partial class SimplePlayer : UserControl
     private Size _currentSize;
 
     private SimpleViewModel? Vm { get; set; }
+
+    public ObservableCollection<Bitmap> Screenshots { get; } = new();
 
     public SimplePlayer()
     {
@@ -58,7 +62,6 @@ public partial class SimplePlayer : UserControl
         if (Vm?.Player is { } player)
         {
             Vm.InitPlayer();
-            player.UpdateTargetVisual(_presenters[_currentPresenter]);
             player.NaturalSizeChanged += Player_NaturalSizeChanged;
         }
     }
@@ -143,6 +146,7 @@ public partial class SimplePlayer : UserControl
         {
             var bmp = await compositionVisual.Compositor.CreateCompositionVisualSnapshot(compositionVisual, 1);
             bmp.Save(@"C:\Dev\Junk\bmp.bmp");
+            Screenshots.Add(bmp);
         }
     }
 }
