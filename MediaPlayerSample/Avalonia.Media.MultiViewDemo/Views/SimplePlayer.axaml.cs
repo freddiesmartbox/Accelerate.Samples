@@ -8,6 +8,7 @@ using Avalonia.Layout;
 using Avalonia.Media.MultiViewDemo.ViewModels;
 using Avalonia.Platform.Storage;
 using Avalonia.Rendering.Composition;
+using Avalonia.VisualTree;
 
 namespace Avalonia.Media.MultiViewDemo.Views;
 
@@ -26,21 +27,34 @@ public partial class SimplePlayer : UserControl
         _presenters = new[] { _presenter1, _presenter2, _presenter3 };
         _currentPresenter = 0;
 
-        DataContext = new SimpleViewModel();
-
-        this.DetachedFromVisualTree += SimplePlayer_DetachedFromVisualTree;
+        this.DataContextChanged += SimplePlayer_DataContextChanged;
+        this.Loaded += SimplePlayer_Loaded;
+        this.Unloaded += SimplePlayer_Unloaded;
     }
 
-    private void SimplePlayer_DetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+    private void SimplePlayer_DataContextChanged(object? sender, EventArgs e)
+    {
+        if (Vm is { } oldVm)
+            Vm?.Player?.UnInitialize();
+
+        Vm = DataContext as SimpleViewModel;
+
+        if (this.IsAttachedToVisualTree())
+            TryInitPlayer();
+    }
+
+    private void SimplePlayer_Loaded(object? sender, RoutedEventArgs e)
+    {
+        TryInitPlayer();
+    }
+
+    private void SimplePlayer_Unloaded(object? sender, RoutedEventArgs e)
     {
         Vm?.Player?.UnInitialize();
     }
 
-    protected override void OnDataContextChanged(EventArgs e)
+    private void TryInitPlayer()
     {
-        base.OnDataContextChanged(e);
-        Vm = DataContext as SimpleViewModel;
-
         if (Vm?.Player is { } player)
         {
             Vm.InitPlayer();
