@@ -11,6 +11,7 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
         [ObservableProperty] private TimeSpan? _position;
         [ObservableProperty] private long _ticks = 1;
         [ObservableProperty] private long _currentPosition;
+        [ObservableProperty] private bool _autoplay = true;
         private bool _initialized;
 
         public MediaPlayer Player { get; } = new MediaPlayer();
@@ -28,6 +29,11 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
                 await Player.StopAsync();
                 Player.Source = Source;
                 await Player.PrepareAsync();
+            }
+
+            if (e.PropertyName == nameof(Autoplay))
+            {
+                Player.LoadedBehavior = Autoplay ? MediaPlayerLoadedBehavior.AutoPlay : MediaPlayerLoadedBehavior.Manual;
             }
         }
 
