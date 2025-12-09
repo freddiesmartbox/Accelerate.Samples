@@ -24,7 +24,7 @@ public partial class SimplePlayer : UserControl
     {
         InitializeComponent();
 
-        _presenters = new[] { _presenter1, _presenter2, _presenter3 };
+        _presenters = [_presenter1, _presenter2, _presenter3];
         _currentPresenter = 0;
 
         this.DataContextChanged += SimplePlayer_DataContextChanged;
@@ -130,6 +130,15 @@ public partial class SimplePlayer : UserControl
             player.UpdateTargetVisual(_presenters[_currentPresenter]);
             UpdatePlayerSize(_currentSize);
         }
+    }
+
+    private void CyclePresenter_Click(object? sender, RoutedEventArgs e)
+    {
+        if (Vm?.Player is { } player)
+            player.UpdateTargetVisual(null);
+        
+        var owner = (Viewbox)_presenters[_currentPresenter].Parent!;
+        _presenters[_currentPresenter] = owner.Child = new MediaPlayerPresenter();
     }
 
     public async void SnapAsync()

@@ -36,15 +36,16 @@
             <Border Margin="5" Padding="5" BorderBrush="Blue" BorderThickness="1">
                 <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch" RowDefinitions="Auto,Auto,Auto">
                     <Label Margin="5">Controls</Label>
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <WrapPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Name="_loadButton" Click="LoadButton_Click">Load Media</Button>
                         <Button Name="ToggleButton" Click="ToggleButton_Click">Toggle Viewer</Button>
                         <Button Command="{Binding PlayAsync}">Play</Button>
                         <Button Command="{Binding PauseAsync}">Pause</Button>
                         <Button Command="{Binding StopAsync}">Stop</Button>
                         <Button Command="{Binding #Me.SnapAsync}">Snap</Button>
+                        <Button Name="CyclePresenter" Click="CyclePresenter_Click">Cycle Presenter</Button>
                         <ToggleButton IsChecked="{Binding Autoplay}">Autoplay</ToggleButton>
-                    </StackPanel>
+                    </WrapPanel>
                     <Grid HorizontalAlignment="Stretch" Grid.Row="2" ColumnDefinitions="Auto,*,Auto">
                         <Label Width="70" VerticalAlignment="Center" Grid.Column="0" Margin="5"
                                Content="{Binding Position, StringFormat='hh\\:mm\\:ss'}" />
