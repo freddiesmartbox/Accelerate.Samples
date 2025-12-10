@@ -73,6 +73,8 @@
                         <Button Command="{Binding #Me.SnapAsync}">Snap</Button>
                         <Button Name="CyclePresenter" Click="CyclePresenter_Click">Cycle Presenter</Button>
                         <ToggleButton IsChecked="{Binding Autoplay}">Autoplay</ToggleButton>
+                        <ToggleButton IsChecked="{Binding Autopause}" IsEnabled="{Binding Autoplay}">Autopause</ToggleButton>
+                        <ToggleButton IsChecked="{Binding IsMuted}">Mute</ToggleButton>
                     </WrapPanel>
                     <Grid HorizontalAlignment="Stretch" Grid.Row="2" ColumnDefinitions="Auto,*,Auto">
                         <Label Width="70" VerticalAlignment="Center" Grid.Column="0" Margin="5"

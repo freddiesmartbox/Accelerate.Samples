@@ -12,7 +12,11 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
         [ObservableProperty] private long _ticks = 1;
         [ObservableProperty] private long _currentPosition;
         [ObservableProperty] private bool _autoplay = true;
+        [ObservableProperty] private bool _autopause = false;
+        [ObservableProperty] private bool _isMuted = false;
+        [ObservableProperty] private double _volume = 1.0;
         private bool _initialized;
+        private bool _shouldAutopause = false;
 
         public MediaPlayer Player { get; } = new MediaPlayer();
 
@@ -27,6 +31,9 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
             if (e.PropertyName == nameof(Source))
             {
                 await Player.StopAsync();
+                _shouldAutopause = Autoplay && Autopause;
+                Player.IsMuted = IsMuted || Autopause;
+                Player.Volume = Volume;
                 if (Source is not null)
                 {
                     await Player.SetSourceAsync(Source);
@@ -40,6 +47,16 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
             }
         }
 
+        partial void OnIsMutedChanged(bool value)
+        {
+            Player.IsMuted = value;
+        }
+
+        partial void OnVolumeChanged(double value)
+        {
+            Player.Volume = Volume;
+        }
+
         public async void InitPlayer()
         {
             if (_initialized)
@@ -48,12 +65,33 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
             await Player.InitializeAsync();
 
             Player.PropertyChanged += Player_PropertyChanged;
-
+            Player.MediaStarted += Player_MediaStarted;
+            Player.NaturalSizeChanged += Player_NaturalSizeChanged;
 
             _initialized = true;
         }
 
-        private void Player_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void Player_NaturalSizeChanged(object? sender, NaturalSizeChangedEventArgs e)
+        {
+            AutopauseIfRequested();
+        }
+
+        private void Player_MediaStarted(object? sender, EventArgs e)
+        {
+            // this doesn't seem to be a reliable place to pause
+        }
+
+        private async void AutopauseIfRequested()
+    {
+            if (_shouldAutopause)
+            {
+                _shouldAutopause = false;
+                await Player.PauseAsync();
+                Player.Position = TimeSpan.FromMilliseconds(100);
+            }
+        }
+
+        private async void Player_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Player.Duration))
             {
