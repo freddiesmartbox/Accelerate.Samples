@@ -41,6 +41,8 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
                 _shouldAutopause = Autoplay && Autopause;
                 Player.IsMuted = IsMuted || _shouldAutopause;
                 Player.Volume = Volume;
+
+                await Player.PrepareAsync();
             }
 
             if (e.PropertyName == nameof(Autoplay))
@@ -52,6 +54,7 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
         partial void OnIsMutedChanged(bool value)
         {
             Player.IsMuted = value;
+            Player.Volume = Volume;
         }
 
         partial void OnVolumeChanged(double value)
