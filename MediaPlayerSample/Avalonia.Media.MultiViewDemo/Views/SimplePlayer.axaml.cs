@@ -139,12 +139,12 @@ public partial class SimplePlayer : UserControl
     {
         if (Vm?.Player is { } player)
             player.UpdateTargetVisual(null);
-        
+
         var owner = (Viewbox)_presenters[_currentPresenter].Parent!;
         _presenters[_currentPresenter] = owner.Child = new MediaPlayerPresenter();
     }
 
-    public async void SnapAsync()
+    public async void Snap_Click(object? sender, RoutedEventArgs e)
     {
         if (ElementComposition.GetElementChildVisual(_presenters[_currentPresenter]) is { } compositionVisual)
         {
