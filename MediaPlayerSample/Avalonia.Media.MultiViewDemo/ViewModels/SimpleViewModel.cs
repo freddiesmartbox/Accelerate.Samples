@@ -65,7 +65,6 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
             await Player.InitializeAsync();
 
             Player.PropertyChanged += Player_PropertyChanged;
-            Player.MediaStarted += Player_MediaStarted;
             Player.NaturalSizeChanged += Player_NaturalSizeChanged;
 
             _initialized = true;
@@ -73,25 +72,22 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
 
         private void Player_NaturalSizeChanged(object? sender, NaturalSizeChangedEventArgs e)
         {
+            // NaturalSizeChanged implies it may not fire if the natural size doesn't change, which may be a problem;
+            // in testing, however, this hasn't been observed...
             AutopauseIfRequested();
         }
 
-        private void Player_MediaStarted(object? sender, EventArgs e)
-        {
-            // this doesn't seem to be a reliable place to pause
-        }
-
         private async void AutopauseIfRequested()
-    {
+        {
             if (_shouldAutopause)
             {
                 _shouldAutopause = false;
                 await Player.PauseAsync();
-                Player.Position = TimeSpan.FromMilliseconds(100);
+                //Player.Position = TimeSpan.FromMilliseconds(100); // don't seem to need anything like this
             }
         }
 
-        private async void Player_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void Player_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Player.Duration))
             {
