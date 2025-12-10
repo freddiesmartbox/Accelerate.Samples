@@ -70,11 +70,17 @@
                         <Button Command="{Binding PlayAsync}">Play</Button>
                         <Button Command="{Binding PauseAsync}">Pause</Button>
                         <Button Command="{Binding StopAsync}">Stop</Button>
-                        <Button Command="{Binding #Me.SnapAsync}">Snap</Button>
-                        <Button Name="CyclePresenter" Click="CyclePresenter_Click">Cycle Presenter</Button>
+                        <Button Name="Snap" Click="Snap_Click" ToolTip.Tip="Takes a snapshot">Snap</Button>
+                        <Button Name="CyclePresenter" Click="CyclePresenter_Click" ToolTip.Tip="Destroys and replaces the current presenter. Does not reattach the player">Cycle Presenter</Button>
                         <ToggleButton IsChecked="{Binding Autoplay}">Autoplay</ToggleButton>
-                        <ToggleButton IsChecked="{Binding Autopause}" IsEnabled="{Binding Autoplay}">Autopause</ToggleButton>
+                        <ToggleButton IsChecked="{Binding Autopause}" IsEnabled="{Binding Autoplay}" ToolTip.Tip="Attempts to pause on the first frame of video.">Autopause</ToggleButton>
                         <ToggleButton IsChecked="{Binding IsMuted}">Mute</ToggleButton>
+                        <Grid>
+                          <Slider Height="20" Minimum="0" Maximum="1" TickFrequency="0.05" Value="{Binding Volume}" Width="100" />
+                          <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5" IsHitTestVisible="False">
+                            <Run Text="Volume:" /><Run Text="{Binding Volume, StringFormat=0.00}" />
+                          </TextBlock>
+                        </Grid>
                     </WrapPanel>
                     <Grid HorizontalAlignment="Stretch" Grid.Row="2" ColumnDefinitions="Auto,*,Auto">
                         <Label Width="70" VerticalAlignment="Center" Grid.Column="0" Margin="5"
