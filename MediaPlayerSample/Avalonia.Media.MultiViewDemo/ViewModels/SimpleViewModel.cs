@@ -31,11 +31,13 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
             if (e.PropertyName == nameof(Source))
             {
                 await Player.StopAsync();
-                _shouldAutopause = Autoplay && Autopause;
-                Player.IsMuted = IsMuted || Autopause;
-                Player.Volume = Volume;
                 Player.Source = Source;
                 await Player.PrepareAsync();
+
+                // Ideally we would set IsMuted before calling Prepare, but that doesn't seem to work
+                _shouldAutopause = Autoplay && Autopause;
+                Player.IsMuted = IsMuted || _shouldAutopause;
+                Player.Volume = Volume;
             }
 
             if (e.PropertyName == nameof(Autoplay))
@@ -80,7 +82,10 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
             {
                 _shouldAutopause = false;
                 await Player.PauseAsync();
-                //Player.Position = TimeSpan.FromMilliseconds(100); // don't seem to need anything like this
+
+                // reset volume so it is as expected when playback starts again
+                Player.IsMuted = IsMuted;
+                Player.Volume = Volume;
             }
         }
 
