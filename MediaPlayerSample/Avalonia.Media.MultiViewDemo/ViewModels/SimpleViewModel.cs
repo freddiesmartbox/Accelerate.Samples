@@ -32,12 +32,12 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
             {
                 await Player.StopAsync();
                 Player.Source = Source;
-                await Player.PrepareAsync();
 
-                // Ideally we would set IsMuted before calling Prepare, but that doesn't seem to work
                 _shouldAutopause = Autoplay && Autopause;
                 Player.IsMuted = IsMuted || _shouldAutopause;
                 Player.Volume = Volume;
+
+                await Player.PrepareAsync();
             }
 
             if (e.PropertyName == nameof(Autoplay))
@@ -49,6 +49,7 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
         partial void OnIsMutedChanged(bool value)
         {
             Player.IsMuted = value;
+            Player.Volume = Volume;
         }
 
         partial void OnVolumeChanged(double value)
