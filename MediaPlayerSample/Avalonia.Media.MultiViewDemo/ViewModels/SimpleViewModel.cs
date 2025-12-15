@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using Avalonia.Controls.Templates;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Avalonia.Media.MultiViewDemo.ViewModels
@@ -83,6 +84,7 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
             {
                 _shouldAutopause = false;
                 await Player.PauseAsync();
+                Player.Position = TimeSpan.FromMilliseconds(100);
 
                 // reset volume so it is as expected when playback starts again
                 Player.IsMuted = IsMuted;
@@ -97,10 +99,16 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
                 Duration = Player.Duration;
                 Ticks = Duration?.Ticks ?? 0;
             }
-            else if(e.PropertyName == nameof(Player.Position))
+            else if (e.PropertyName == nameof(Player.Position))
             {
                 var position = Player.Position;
-                Ticks = long.Max(Ticks, position.Ticks);
+
+                // force duration to position if we exceed it
+                if (Duration < position)
+                    Duration = position;
+                if (Ticks < position.Ticks)
+                    Ticks = position.Ticks;
+
                 CurrentPosition = position.Ticks;
                 Position = position;
             }
