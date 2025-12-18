@@ -1,7 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using Avalonia.Controls.Templates;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using TerraFX.Interop.Vulkan;
 
 namespace Avalonia.Media.MultiViewDemo.ViewModels
 {
@@ -44,6 +47,7 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
                 Player.Volume = Volume;
 
                 await Player.PrepareAsync();
+                //await AutopauseIfRequested();
             }
 
             if (e.PropertyName == nameof(Autoplay))
@@ -67,27 +71,26 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
         {
             if (_initialized)
                 return;
+
             Player.LoadedBehavior = MediaPlayerLoadedBehavior.AutoPlay;
+
             await Player.InitializeAsync();
 
             Player.PropertyChanged += Player_PropertyChanged;
-            Player.NaturalSizeChanged += Player_NaturalSizeChanged;
+            Player.MediaStarted += Player_MediaStarted;
 
             _initialized = true;
         }
 
-        private void Player_NaturalSizeChanged(object? sender, NaturalSizeChangedEventArgs e)
+        private async void Player_MediaStarted(object? sender, EventArgs e)
         {
-            // NaturalSizeChanged implies it may not fire if the natural size doesn't change, which may be a problem;
-            // in testing, however, this hasn't been observed...
-            AutopauseIfRequested();
+            await AutopauseIfRequested();
         }
 
-        private async void AutopauseIfRequested()
+        private async Task AutopauseIfRequested()
         {
             if (_shouldAutopause)
             {
-                _shouldAutopause = false;
                 await Player.PauseAsync();
                 Player.Position = TimeSpan.FromMilliseconds(100);
 
@@ -97,7 +100,7 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
             }
         }
 
-        private void Player_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private async void Player_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Player.Duration))
             {
@@ -121,6 +124,12 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
 
         public async void PlayAsync()
         {
+            if (_shouldAutopause)
+            {
+                _shouldAutopause = false; // reset latch
+                Player.Position = TimeSpan.FromMilliseconds(0); // return to start
+            }
+
             await Player.PlayAsync();
         }
 
