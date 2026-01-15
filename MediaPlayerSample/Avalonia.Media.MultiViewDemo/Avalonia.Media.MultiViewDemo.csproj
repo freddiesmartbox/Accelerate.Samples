@@ -14,16 +14,11 @@
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.1" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia.Controls.MediaPlayer" Version="12.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- Developer Tools integration -->
-    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.*" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="Avalonia.Controls.MediaPlayer" Version="12.0.999-cibuild0000091-alpha" />
   </ItemGroup>
 </Project>
