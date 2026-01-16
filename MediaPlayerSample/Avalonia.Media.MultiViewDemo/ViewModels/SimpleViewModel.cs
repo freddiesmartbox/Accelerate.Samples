@@ -1,5 +1,11 @@
 ﻿using System;
+using System.Collections.Frozen;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls.Templates;
 using Avalonia.Threading;
@@ -19,8 +25,14 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
         [ObservableProperty] private bool _autopause = false;
         [ObservableProperty] private bool _isMuted = false;
         [ObservableProperty] private double _volume = 1.0;
+        [ObservableProperty]  private bool _isPlaying = false;
+
         private bool _initialized;
         private bool _shouldAutopause = false;
+
+        private string _myVideosDirectory = "Videos";
+        private IReadOnlyList<string>? _myVideos;
+        private int _myVideosIndex = -1;
 
         public MediaPlayer Player { get; } = new MediaPlayer();
 
@@ -79,6 +91,7 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
 
         private async void Player_MediaStarted(object? sender, EventArgs e)
         {
+            IsPlaying = !_shouldAutopause;
             await AutopauseIfRequested();
         }
 
@@ -86,7 +99,7 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
         {
             if (_shouldAutopause)
             {
-                await Player.PauseAsync();
+                await PauseAsync();
                 Player.Position = TimeSpan.FromMilliseconds(100);
 
                 // reset volume so it is as expected when playback starts again
@@ -117,7 +130,7 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
             }
         }
 
-        public async void PlayAsync()
+        public async Task PlayAsync()
         {
             if (_shouldAutopause)
             {
@@ -126,16 +139,71 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
             }
 
             await Player.PlayAsync();
+            IsPlaying = true;
         }
 
-        public async void PauseAsync()
+        public async Task PauseAsync()
         {
             await Player.PauseAsync();
+            IsPlaying = false;
         }
 
-        public async void StopAsync()
+        public async Task StopAsync()
         {
             await Player.StopAsync();
+            IsPlaying = false;
+        }
+
+        public async Task PlayPauseAsync()
+        {
+            if (IsPlaying)
+                await PauseAsync();
+            else
+                await PlayAsync();
+        }
+
+        private static FrozenSet<string> _videoExtensions = [".avi", ".mp4", "mpeg", ".ogv", ".flv"];
+
+        [MemberNotNull(nameof(_myVideos))]
+        private void EnsureMyVideos()
+        {
+            if (_myVideos is null)
+            {
+                var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                var dir = Path.Combine(home, _myVideosDirectory);
+
+                _myVideos = Directory.EnumerateFiles(dir, "*", System.IO.SearchOption.AllDirectories)
+                    .Where(f => _videoExtensions.Contains(Path.GetExtension(f)))
+                    .ToImmutableArray();
+            }
+        }
+
+        public async void PlayPreviousAsync()
+        {
+            EnsureMyVideos();
+
+            if (_myVideos.Count == 0)
+            {
+                Console.Beep();
+                return;
+            }
+
+            _myVideosIndex = _myVideosIndex < 1 ? _myVideos.Count - 1 : _myVideosIndex - 1;
+            Source = new UriSource(_myVideos[_myVideosIndex]);
+        }
+
+        public async void PlayNextAsync()
+        {
+            EnsureMyVideos();
+
+            if (_myVideos.Count == 0)
+            {
+                Console.Beep();
+                return;
+            }
+
+            _myVideosIndex = (_myVideosIndex + 1) % _myVideos.Count;
+            Source = new UriSource(_myVideos[_myVideosIndex]);
         }
 
         public void Dispose()
