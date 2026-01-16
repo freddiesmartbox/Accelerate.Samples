@@ -7,6 +7,13 @@
              x:DataType="vm:SimpleViewModel" 
              x:Class="Avalonia.Media.MultiViewDemo.Views.SimplePlayer"
              x:Name="Me">
+    <UserControl.KeyBindings>
+      <KeyBinding Gesture="P" Command="{Binding PlayPreviousAsync}" />
+      <KeyBinding Gesture="N" Command="{Binding PlayNextAsync}" />
+      <KeyBinding Gesture="S" Command="{Binding StopAsync}" />
+      <KeyBinding Gesture="T" Command="{Binding PlayPauseAsync}" />
+    </UserControl.KeyBindings>
+
     <DockPanel Margin="5">
           <ItemsControl ItemsSource="{Binding #Me.Screenshots}" DockPanel.Dock="Right">
               <ItemsControl.ItemsPanel>
@@ -67,8 +74,10 @@
                     <WrapPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Name="_loadButton" Click="LoadButton_Click">Load Media</Button>
                         <Button Name="ToggleButton" Click="ToggleButton_Click">Toggle Viewer</Button>
-                        <Button Command="{Binding PlayAsync}">Play</Button>
-                        <Button Command="{Binding PauseAsync}">Pause</Button>
+                        <Button Command="{Binding PlayAsync}" IsEnabled="{Binding !IsPlaying}">Play</Button>
+                        <Button Command="{Binding PlayPreviousAsync}">Prev</Button>
+                        <Button Command="{Binding PlayNextAsync}">Next</Button>
+                        <Button Command="{Binding PauseAsync}" IsEnabled="{Binding IsPlaying}">Pause</Button>
                         <Button Command="{Binding StopAsync}">Stop</Button>
                         <Button Name="Snap" Click="Snap_Click" ToolTip.Tip="Takes a snapshot">Snap</Button>
                         <Button Name="CyclePresenter" Click="CyclePresenter_Click" ToolTip.Tip="Destroys and replaces the current presenter. Does not reattach the player">Cycle Presenter</Button>
