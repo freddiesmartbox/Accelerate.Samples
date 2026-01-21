@@ -25,7 +25,7 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
         [ObservableProperty] private bool _autopause = false;
         [ObservableProperty] private bool _isMuted = false;
         [ObservableProperty] private double _volume = 1.0;
-        [ObservableProperty]  private bool _isPlaying = false;
+        [ObservableProperty] private bool _isPlaying = false;
 
         private bool _initialized;
         private bool _shouldAutopause = false;
@@ -35,6 +35,7 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
         private int _myVideosIndex = -1;
 
         public MediaPlayer Player { get; } = new MediaPlayer();
+        public TimeSpan AutopausePosition { get; set; } = TimeSpan.FromMilliseconds(100);
 
         public SimpleViewModel()
         {
@@ -100,7 +101,7 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
             if (_shouldAutopause)
             {
                 await PauseAsync();
-                Player.Position = TimeSpan.FromMilliseconds(100);
+                Player.Position = AutopausePosition;
 
                 // reset volume so it is as expected when playback starts again
                 Player.IsMuted = IsMuted;
@@ -112,6 +113,12 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
         {
             if (e.PropertyName == nameof(Player.Duration))
             {
+                if (_shouldAutopause)
+                {
+                    // apply Position here, because it doesn't for our purposes when on the first invocation of MediaStarted
+                    Player.Position = AutopausePosition;
+                }
+
                 Duration = Player.Duration;
                 Ticks = Duration?.Ticks ?? 0;
             }
