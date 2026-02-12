@@ -45,7 +45,14 @@
 
         <UniformGrid Rows="2" Columns="2">
             <Border Margin="5" Padding="5" BorderBrush="Red" BorderThickness="1">
-                <Grid RowDefinitions="Auto,*">
+                <Border.Styles>
+                   <Style Selector="Grid:pointerover">
+                     <Setter Property="ClipToBounds" Value="False" />
+                     <Setter Property="RenderTransformOrigin" Value="0%,0%" />
+                     <Setter Property="RenderTransform" Value="scale(2,2)" />
+                   </Style>
+                </Border.Styles>
+                <Grid RowDefinitions="Auto,*" Background="Transparent">
                     <Label Margin="5">Vid 1</Label>
                     <Viewbox Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                         <MediaPlayerPresenter Name="_presenter1" />
