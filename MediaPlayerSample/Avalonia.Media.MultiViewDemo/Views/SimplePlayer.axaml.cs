@@ -11,6 +11,7 @@ using Avalonia.Media.MultiViewDemo.ViewModels;
 using Avalonia.Platform.Storage;
 using Avalonia.Rendering.Composition;
 using Avalonia.VisualTree;
+using Vortice.MediaFoundation;
 
 namespace Avalonia.Media.MultiViewDemo.Views;
 
@@ -73,10 +74,15 @@ public partial class SimplePlayer : UserControl
 
     private void UpdatePlayerSize(Size size)
     {
-        Vm?.Player?.UpdateTargetVisual(_presenters[_currentPresenter]);
+        if (_presenters[_currentPresenter] is MediaPlayerPresenter presenter)
+            UpdatePlayerSize(size, presenter);
+    }
+
+    private void UpdatePlayerSize(Size size, MediaPlayerPresenter presenter)
+    {
+        Vm?.Player?.UpdateTargetVisual(presenter);
 
         _currentSize = size;
-        var presenter = _presenters[_currentPresenter];
 
         var elemVisual = ElementComposition.GetElementChildVisual(presenter);
         var compositor = elemVisual?.Compositor;
@@ -89,7 +95,7 @@ public partial class SimplePlayer : UserControl
         }
 
         elemVisual.Size = new Vector(size.Width, size.Height);
-        (presenter as MediaPlayerPresenter)?.SetNaturalSize(size);
+        presenter.SetNaturalSize(size);
         presenter.InvalidateMeasure();
         presenter.InvalidateArrange();
     }
@@ -148,5 +154,16 @@ public partial class SimplePlayer : UserControl
             bmp.Save(@"C:\Dev\Junk\bmp.bmp");
             Screenshots.Add(bmp);
         }
+    }
+
+    public void PopOut_Click(object? sender, RoutedEventArgs e)
+    {
+        var presenter = new MediaPlayerPresenter();
+        var vb = new Viewbox() { Child = presenter, Stretch = Stretch.Uniform };
+        var w = new Window() { Content = vb };
+
+        w.Show();
+
+        UpdatePlayerSize(_currentSize, presenter);
     }
 }
