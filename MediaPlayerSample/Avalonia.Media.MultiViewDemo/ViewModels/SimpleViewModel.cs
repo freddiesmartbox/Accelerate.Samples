@@ -55,7 +55,6 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
                 Player.Volume = Volume;
 
                 await Player.PrepareAsync();
-                //await AutopauseIfRequested();
             }
 
             if (e.PropertyName == nameof(Autoplay))
