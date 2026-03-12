@@ -7,10 +7,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia.Controls.Templates;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using TerraFX.Interop.Vulkan;
 
 namespace Avalonia.Media.MultiViewDemo.ViewModels
 {
@@ -26,6 +25,9 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
         [ObservableProperty] private bool _isMuted = false;
         [ObservableProperty] private double _volume = 1.0;
         [ObservableProperty] private bool _isPlaying = false;
+        [ObservableProperty] private BitmapInterpolationMode _interpolationMode = BitmapInterpolationMode.HighQuality;
+
+        public ImmutableArray<BitmapInterpolationMode> InterpolationModes { get; } = Enum.GetValues<BitmapInterpolationMode>().ToImmutableArray();
 
         private bool _initialized;
         private bool _shouldAutopause = false;
