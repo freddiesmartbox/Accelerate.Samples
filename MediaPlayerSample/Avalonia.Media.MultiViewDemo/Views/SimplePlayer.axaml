@@ -14,7 +14,7 @@
       <KeyBinding Gesture="T" Command="{Binding PlayPauseAsync}" />
     </UserControl.KeyBindings>
 
-    <DockPanel Margin="5" RenderOptions.BitmapInterpolationMode="HighQuality" RenderOptions.EdgeMode="Antialias">
+    <DockPanel Margin="5" RenderOptions.EdgeMode="Antialias">
           <ItemsControl ItemsSource="{Binding #Me.Screenshots}" DockPanel.Dock="Right">
               <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>
@@ -89,6 +89,7 @@
                         <Button Name="Snap" Click="Snap_Click" ToolTip.Tip="Takes a snapshot">Snap</Button>
                         <Button Name="PopOut" Click="PopOut_Click" ToolTip.Tip="Pops out a new window">PopOut</Button>
                         <Button Name="CyclePresenter" Click="CyclePresenter_Click" ToolTip.Tip="Destroys and replaces the current presenter. Does not reattach the player">Cycle Presenter</Button>
+                        <ComboBox SelectedItem="{Binding InterpolationMode}" ItemsSource="{Binding InterpolationModes}" Name="InterpolationModeCbx" />
                         <ToggleButton IsChecked="{Binding Autoplay}">Autoplay</ToggleButton>
                         <ToggleButton IsChecked="{Binding Autopause}" IsEnabled="{Binding Autoplay}" ToolTip.Tip="Attempts to pause on the first frame of video.">Autopause</ToggleButton>
                         <ToggleButton IsChecked="{Binding IsMuted}">Mute</ToggleButton>
