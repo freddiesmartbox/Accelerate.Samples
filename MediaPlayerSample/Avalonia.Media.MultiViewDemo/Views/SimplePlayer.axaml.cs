@@ -35,6 +35,12 @@ public partial class SimplePlayer : UserControl
         this.DataContextChanged += SimplePlayer_DataContextChanged;
         this.Loaded += SimplePlayer_Loaded;
         this.Unloaded += SimplePlayer_Unloaded;
+        this.InterpolationModeCbx.SelectionChanged += InterpolationModeCbx_SelectionChanged;
+    }
+
+    private void InterpolationModeCbx_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        RenderOptions.SetBitmapInterpolationMode(this, Vm!.InterpolationMode);
     }
 
     private void SimplePlayer_DataContextChanged(object? sender, EventArgs e)
@@ -159,8 +165,8 @@ public partial class SimplePlayer : UserControl
     public void PopOut_Click(object? sender, RoutedEventArgs e)
     {
         var presenter = new MediaPlayerPresenter();
-        var vb = new Viewbox() { Child = presenter, Stretch = Stretch.Uniform };
-        var w = new Window() { Content = vb };
+        var vb = new Viewbox() { Child = presenter };
+        var w = new Window() { Content = vb, Width = 300, Height = 300 };
 
         w.Show();
 
