@@ -50,7 +50,7 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
             if (e.PropertyName == nameof(Source))
             {
                 await Player.StopAsync();
-                Player.Source = Source;
+                await Player.SetSourceAsync(Source);
 
                 _shouldAutopause = Autoplay && Autopause;
                 Player.IsMuted = IsMuted || _shouldAutopause;

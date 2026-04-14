@@ -21,9 +21,6 @@ public partial class MainWindow : Window
         {
             TransparencyLevelHint = new[] { WindowTransparencyLevel.AcrylicBlur, };
             ExtendClientAreaToDecorationsHint = true;
-            ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.OSXThickTitleBar |
-                                               ExtendClientAreaChromeHints.Default |
-                                               ExtendClientAreaChromeHints.PreferSystemChrome;
             ExtendClientAreaTitleBarHeightHint = 48;
         }
     }

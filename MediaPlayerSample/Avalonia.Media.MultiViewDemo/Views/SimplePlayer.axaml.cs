@@ -11,6 +11,7 @@ using Avalonia.Media.MultiViewDemo.ViewModels;
 using Avalonia.Platform.Storage;
 using Avalonia.Rendering.Composition;
 using Avalonia.VisualTree;
+using Vortice.Direct3D;
 using Vortice.MediaFoundation;
 
 namespace Avalonia.Media.MultiViewDemo.Views;
@@ -165,6 +166,8 @@ public partial class SimplePlayer : UserControl
         var presenter = new MediaPlayerPresenter();
         var vb = new Viewbox() { Child = presenter };
         var w = new Window() { Content = vb, Width = 300, Height = 300 };
+        if (InterpolationModeCbx.SelectedValue is BitmapInterpolationMode interpolationMode)
+            RenderOptions.SetBitmapInterpolationMode(w, interpolationMode);
 
         w.Show();
 
