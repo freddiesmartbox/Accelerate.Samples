@@ -86,8 +86,6 @@ public partial class SimplePlayer : UserControl
 
     private void UpdatePlayerSize(Size size, MediaPlayerPresenter presenter)
     {
-        Vm?.Player?.UpdateTargetVisual(presenter);
-
         _currentSize = size;
 
         foreach(var p in _presenters)
@@ -101,6 +99,9 @@ public partial class SimplePlayer : UserControl
 
         if (compositor is null || elemVisual is null)
         {
+            // not got the composition element yet: try again next frame
+            Vm?.Player?.UpdateTargetVisual(presenter);
+            TopLevel.GetTopLevel(this)?.RequestAnimationFrame(_ => UpdatePlayerSize(size));
             return;
         }
 
