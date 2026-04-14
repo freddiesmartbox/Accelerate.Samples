@@ -49,17 +49,13 @@ public partial class SimplePlayer : UserControl
         _currentSize = size;
         var presenter = _presenters[_currentPresenter];
 
-        foreach(var p in _presenters)
-        {
-            var e = ElementComposition.GetElementChildVisual(p);
-            var c = e?.Compositor;
-        }
-
         var elemVisual = ElementComposition.GetElementChildVisual(presenter);
         var compositor = elemVisual?.Compositor;
 
         if (compositor is null || elemVisual is null)
         {
+            // not got the composition element yet: try again next frame
+            TopLevel.GetTopLevel(this)?.RequestAnimationFrame(_ => UpdatePlayerSize(size));
             return;
         }
 
