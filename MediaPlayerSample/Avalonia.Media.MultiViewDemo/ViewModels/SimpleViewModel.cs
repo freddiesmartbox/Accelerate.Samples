@@ -92,8 +92,14 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
 
             Player.PropertyChanged += Player_PropertyChanged;
             Player.MediaStarted += Player_MediaStarted;
+            Player.ErrorOccurred += Player_ErrorOccurred;
 
             _initialized = true;
+        }
+
+        private void Player_ErrorOccurred(object? sender, MediaPlayerErrorEventArgs e)
+        {
+            //throw new NotImplementedException();
         }
 
         private async void Player_MediaStarted(object? sender, EventArgs e)
