@@ -17,8 +17,9 @@ namespace Avalonia.Media.MultiViewDemo.Views;
 
 public partial class SimplePlayer : UserControl
 {
-    private Layoutable[] _presenters;
-    private int _currentPresenter;
+    private MediaPlayerPresenter[] _presenters;
+    private int _currentPresenterIndex;
+    private MediaPlayerPresenter _currentPresenter;
     private Size _currentSize;
 
     private SimpleViewModel? Vm { get; set; }
@@ -30,7 +31,8 @@ public partial class SimplePlayer : UserControl
         InitializeComponent();
 
         _presenters = [_presenter1, _presenter2, _presenter3];
-        _currentPresenter = 0;
+        _currentPresenterIndex = 0;
+        _currentPresenter = _presenter1;
 
         this.DataContextChanged += SimplePlayer_DataContextChanged;
         this.Loaded += SimplePlayer_Loaded;
@@ -69,6 +71,7 @@ public partial class SimplePlayer : UserControl
         if (Vm?.Player is { } player)
         {
             Vm.InitPlayer();
+            player.UpdateTargetVisual(_currentPresenter);
             player.NaturalSizeChanged += Player_NaturalSizeChanged;
         }
     }
@@ -80,28 +83,18 @@ public partial class SimplePlayer : UserControl
 
     private void UpdatePlayerSize(Size size)
     {
-        if (_presenters[_currentPresenter] is MediaPlayerPresenter presenter)
-            UpdatePlayerSize(size, presenter);
+        UpdatePlayerSize(size, _currentPresenter);
     }
 
     private void UpdatePlayerSize(Size size, MediaPlayerPresenter presenter)
     {
         _currentSize = size;
 
-        foreach(var p in _presenters)
-        {
-            var e = ElementComposition.GetElementChildVisual(p);
-            var c = e?.Compositor;
-        }
-
         var elemVisual = ElementComposition.GetElementChildVisual(presenter);
         var compositor = elemVisual?.Compositor;
 
         if (compositor is null || elemVisual is null)
         {
-            // not got the composition element yet: try again next frame
-            Vm?.Player?.UpdateTargetVisual(presenter);
-            TopLevel.GetTopLevel(this)?.RequestAnimationFrame(_ => UpdatePlayerSize(size));
             return;
         }
 
@@ -139,27 +132,29 @@ public partial class SimplePlayer : UserControl
 
     private void ToggleButton_Click(object? sender, RoutedEventArgs e)
     {
-        _currentPresenter = (++_currentPresenter) % _presenters.Length;
+        _currentPresenterIndex = (++_currentPresenterIndex) % _presenters.Length;
+        _currentPresenter = _presenters[_currentPresenterIndex];
 
         if (Vm?.Player is { } player)
         {
-            player.UpdateTargetVisual(_presenters[_currentPresenter]);
+            player.UpdateTargetVisual(_currentPresenter);
             UpdatePlayerSize(_currentSize);
         }
     }
 
     private void CyclePresenter_Click(object? sender, RoutedEventArgs e)
     {
-        if (Vm?.Player is { } player)
-            player.UpdateTargetVisual(null);
+        Vm?.Player?.UpdateTargetVisual(null);
 
-        var owner = (Viewbox)_presenters[_currentPresenter].Parent!;
-        _presenters[_currentPresenter] = owner.Child = new MediaPlayerPresenter();
+        var owner = (Viewbox)_currentPresenter?.Parent!;
+        owner.Child = _currentPresenter = new MediaPlayerPresenter();
+        
+        Vm?.Player?.UpdateTargetVisual(_currentPresenter);
     }
 
     public async void Snap_Click(object? sender, RoutedEventArgs e)
     {
-        if (ElementComposition.GetElementChildVisual(_presenters[_currentPresenter]) is { } compositionVisual)
+        if (ElementComposition.GetElementChildVisual(_currentPresenter) is { } compositionVisual)
         {
             var bmp = await compositionVisual.Compositor.CreateCompositionVisualSnapshot(compositionVisual, 1);
             bmp.Save(@"C:\Dev\Junk\bmp.bmp");
@@ -169,12 +164,19 @@ public partial class SimplePlayer : UserControl
 
     public void PopOut_Click(object? sender, RoutedEventArgs e)
     {
-        var presenter = new MediaPlayerPresenter();
-        var vb = new Viewbox() { Child = presenter };
-        var w = new Window() { Content = vb, Width = 300, Height = 300 };
+        var presenter = _currentPresenter = new MediaPlayerPresenter();
+        var vb = new Viewbox() { Child = presenter, VerticalAlignment = VerticalAlignment.Stretch, HorizontalAlignment = HorizontalAlignment.Stretch };
+        var dp = new DockPanel() { VerticalAlignment = VerticalAlignment.Stretch, HorizontalAlignment = HorizontalAlignment.Stretch };
+        dp.Children.Add(new TextBlock() { Text = "PopOut", [DockPanel.DockProperty] = Dock.Top, HorizontalAlignment = HorizontalAlignment.Center, Margin = new(2), FontWeight = FontWeight.SemiBold });
+        dp.Children.Add(vb);
+        var w = new Window() { Content = dp, Width = 300, Height = 300 };
+
+        presenter.AttachedToVisualTree += (s, e) =>
+        {
+            Vm?.Player.UpdateTargetVisual(presenter);
+            UpdatePlayerSize(_currentSize, presenter);
+        };
 
         w.Show();
-
-        UpdatePlayerSize(_currentSize, presenter);
     }
 }

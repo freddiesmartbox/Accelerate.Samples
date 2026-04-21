@@ -41,6 +41,18 @@ namespace Avalonia.Media.MultiViewDemo.ViewModels
 
         public SimpleViewModel()
         {
+            Player.MediaStopped += Player_MediaStopped;
+            Player.MediaPlaybackCompleted += Player_MediaPlaybackCompleted;
+        }
+
+        private void Player_MediaStopped(object? sender, EventArgs e)
+        {
+            IsPlaying = false;
+        }
+
+        private void Player_MediaPlaybackCompleted(object? sender, EventArgs e)
+        {
+            IsPlaying = false;
         }
 
         protected async override void OnPropertyChanged(PropertyChangedEventArgs e)
